@@ -837,7 +837,9 @@ void PipelineCache::LoadDiskResources(u64 title_id, std::stop_token stop_loading
     if (title_id == 0x0400C3F00006E000ULL) {
         base_dir /= "mkw_zero_depth_v1";
     }
-    if (!Common::FS::CreateDir(shader_dir) || !Common::FS::CreateDir(base_dir)) {
+    // CreateDirs: base_dir can be two levels below shader_dir (<title_id>/mkw_zero_depth_v1), and
+    // CreateDir only creates the last component, so on a fresh install the cache was never saved.
+    if (!Common::FS::CreateDirs(base_dir)) {
         LOG_ERROR(Common_Filesystem, "Failed to create pipeline cache directories");
         return;
     }
